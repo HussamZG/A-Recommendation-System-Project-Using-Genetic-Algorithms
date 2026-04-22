@@ -1,0 +1,10 @@
+{
+  "name": "مختبر التوصيات الجينية",
+  "description": "منصة عربية لتحليل البيانات السلوكية وتوليد توصيات منتجات جديدة اعتمادًا على الخوارزمية الجينية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "server-rendered catalog filtering",
+    "genetic recommendation generation",
+    "excel-driven data pipeline"
+  ]
+}
