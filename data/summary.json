@@ -1,0 +1,155 @@
+{
+  "totalUsers": 1000,
+  "totalProducts": 500,
+  "totalRatings": 4975,
+  "totalBehaviorRows": 12231,
+  "maxFitnessScore": 23,
+  "pricing": {
+    "min": 20.0,
+    "max": 1994.0,
+    "avg": 982.49
+  },
+  "funnel": {
+    "views": 12231,
+    "clicks": 7871,
+    "purchases": 3354,
+    "clickRate": 64.4,
+    "purchaseRate": 27.4,
+    "purchaseFromClicksRate": 42.6
+  },
+  "categoryDistribution": [
+    {
+      "id": "Books",
+      "name": "كتب",
+      "color": "#BA7517",
+      "count": 73,
+      "percentage": 14.6
+    },
+    {
+      "id": "Clothes",
+      "name": "ملابس",
+      "color": "#993556",
+      "count": 62,
+      "percentage": 12.4
+    },
+    {
+      "id": "Electronics",
+      "name": "إلكترونيات",
+      "color": "#4361EE",
+      "count": 68,
+      "percentage": 13.6
+    },
+    {
+      "id": "Home Appliances",
+      "name": "أجهزة منزلية",
+      "color": "#185FA5",
+      "count": 74,
+      "percentage": 14.8
+    },
+    {
+      "id": "Perfumes",
+      "name": "عطور",
+      "color": "#0F6E56",
+      "count": 75,
+      "percentage": 15.0
+    },
+    {
+      "id": "Sports",
+      "name": "رياضة",
+      "color": "#1D9E75",
+      "count": 79,
+      "percentage": 15.8
+    },
+    {
+      "id": "Toys",
+      "name": "ألعاب",
+      "color": "#993C1D",
+      "count": 69,
+      "percentage": 13.8
+    }
+  ],
+  "ratingDistribution": [
+    {
+      "score": 1,
+      "count": 998,
+      "percentage": 20.1
+    },
+    {
+      "score": 2,
+      "count": 973,
+      "percentage": 19.6
+    },
+    {
+      "score": 3,
+      "count": 998,
+      "percentage": 20.1
+    },
+    {
+      "score": 4,
+      "count": 1001,
+      "percentage": 20.1
+    },
+    {
+      "score": 5,
+      "count": 1005,
+      "percentage": 20.2
+    }
+  ],
+  "topProducts": [
+    {
+      "product_id": 122,
+      "name": "منتج رقم 122",
+      "category": "Toys",
+      "price": 532.0,
+      "rating": 2.9,
+      "rating_count": 9,
+      "views": 34,
+      "clicks": 24,
+      "purchases": 16
+    },
+    {
+      "product_id": 292,
+      "name": "منتج رقم 292",
+      "category": "Sports",
+      "price": 228.0,
+      "rating": 2.6,
+      "rating_count": 13,
+      "views": 35,
+      "clicks": 26,
+      "purchases": 15
+    },
+    {
+      "product_id": 343,
+      "name": "منتج رقم 343",
+      "category": "Electronics",
+      "price": 1504.0,
+      "rating": 3.2,
+      "rating_count": 15,
+      "views": 28,
+      "clicks": 19,
+      "purchases": 15
+    },
+    {
+      "product_id": 145,
+      "name": "منتج رقم 145",
+      "category": "Toys",
+      "price": 1020.0,
+      "rating": 2.7,
+      "rating_count": 10,
+      "views": 32,
+      "clicks": 22,
+      "purchases": 14
+    },
+    {
+      "product_id": 210,
+      "name": "منتج رقم 210",
+      "category": "Electronics",
+      "price": 918.0,
+      "rating": 2.6,
+      "rating_count": 14,
+      "views": 37,
+      "clicks": 26,
+      "purchases": 13
+    }
+  ]
+}
