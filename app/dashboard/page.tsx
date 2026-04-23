@@ -24,7 +24,7 @@ export default async function DashboardPage() {
         <StatsCard title="إجمالي المستخدمين" value={summary.totalUsers.toLocaleString()} icon={<Users className="h-6 w-6" />} />
         <StatsCard title="إجمالي المنتجات" value={summary.totalProducts.toLocaleString()} icon={<Package className="h-6 w-6" />} />
         <StatsCard title="عدد التقييمات" value={summary.totalRatings.toLocaleString()} icon={<ShoppingCart className="h-6 w-6" />} trend={`${averageRating} / 5`} trendUp />
-        <StatsCard title="سجلات السلوك" value={summary.totalBehaviorRows.toLocaleString()} icon={<Activity className="h-6 w-6" />} trend="حيّة أو محلية" trendUp />
+        <StatsCard title="سجلات السلوك" value={summary.totalBehaviorRows.toLocaleString()} icon={<Activity className="h-6 w-6" />} trend="LIVE" trendUp />
       </div>
 
       <div className="mb-8 grid gap-6 lg:grid-cols-3">

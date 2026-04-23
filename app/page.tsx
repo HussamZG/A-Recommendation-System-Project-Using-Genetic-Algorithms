@@ -25,8 +25,7 @@ export default async function Home() {
           </h1>
           <p className="mb-10 text-lg leading-relaxed text-blue-100 md:text-xl">
             المنصة تحلل بيانات المستخدمين والمنتجات والتفاعلات والتقييمات، ثم تولد قائمة منتجات جديدة
-            تناسب كل مستخدم. وعند توفر جداول Supabase تصبح التفاعلات محدثة وواقعية بدل أن تبقى
-            static فقط.
+            تناسب كل مستخدم
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
@@ -96,7 +95,7 @@ export default async function Home() {
           </div>
           <Link
             href="/products"
-            className="inline-flex items-center justify-center rounded-2xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+            className="inline-flex items-center cursor-pointer justify-center rounded-2xl bg-primary px-8 py-4 text-base font-bold text-primary-foreground shadow-sm transition hover:bg-primary/90"
           >
             عرض المنتجات
           </Link>
