@@ -15,9 +15,7 @@ export default async function Home() {
       <section className="relative mb-16 overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-700 px-6 py-16 text-white shadow-xl md:px-10 md:py-24">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)]" />
         <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <p className="mb-4 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1 text-sm font-bold text-blue-100">
-            بيانات حقيقية من Supabase أو ملف Excel المنظف
-          </p>
+          
           <h1 className="mb-6 text-4xl font-black leading-tight md:text-6xl">
             توصيات منتجات جديدة
             <br />
