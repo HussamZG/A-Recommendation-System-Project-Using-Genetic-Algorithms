@@ -139,7 +139,9 @@ export default async function DashboardPage() {
       </div>
 
       <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-slate-900 to-primary p-8 shadow-lg">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-white/10 to-transparent" />
+        <div
+          className="absolute inset-0 bg-gradient-to-tl from-[#181A1B] to-[#000000] opacity-80"
+        />
         <div className="relative z-10 flex flex-col items-center justify-between gap-6 text-center sm:flex-row sm:text-right">
           <div className="text-white">
             <h2 className="mb-2 text-2xl font-bold">جرّب الخوارزمية الجينية الآن</h2>
