@@ -1,23 +1,39 @@
 import Link from 'next/link';
-import { CheckCircle, Eye, MousePointerClick, Star } from 'lucide-react';
+import { CheckCircle, Eye, MousePointerClick, Package, Star, Truck, Shield, User, EyeIcon, MousePointerClick as ClickIcon, ShoppingBag, Star as StarIcon } from 'lucide-react';
 
 import ProductActionButtons from '@/components/ProductActionButtons';
 import ProductCard from '@/components/ProductCard';
 import ProductViewTracker from '@/components/ProductViewTracker';
+import RecommendationReason from '@/components/RecommendationReason';
 import {
   getCatalogSnapshot,
   getRelatedProductsFromProducts,
 } from '@/lib/server/catalog';
+import { getUserInteractions } from '@/lib/server/user-products';
 
 
 interface ProductDetailPageProps {
   params: Promise<{ productId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+function readSingleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+}
+
+export default async function ProductDetailPage({ params, searchParams }: ProductDetailPageProps) {
   const { productId } = await params;
+  const searchParamsData = await searchParams;
   const parsedProductId = Number(productId);
-  const { products, productsById } = await getCatalogSnapshot();
+  const { products, productsById, summary } = await getCatalogSnapshot();
+
+  const userIdParam = readSingleParam(searchParamsData.user).trim();
+  const activeUserId = userIdParam ? Number(userIdParam) : null;
+  const isValidUser = activeUserId && activeUserId >= 1 && activeUserId <= summary.totalUsers;
+
+  // Fetch user interaction for this product if user is specified
+  const userInteractions = isValidUser ? await getUserInteractions(activeUserId) : null;
+  const userProductInteraction = userInteractions?.interactions.get(parsedProductId) ?? null;
 
   const product = Number.isInteger(parsedProductId)
     ? (productsById.get(parsedProductId) ?? null)
@@ -54,6 +70,59 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <span className="text-foreground">{product.name}</span>
       </nav>
 
+      {/* User Context Banner */}
+      {isValidUser && userProductInteraction ? (
+        <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground">تفاعلك مع هذا المنتج كمستخدم #{activeUserId}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {userProductInteraction.viewed > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-muted/40 px-3 py-2">
+                <EyeIcon className="h-4 w-4 text-amber-500" />
+                <span className="text-sm">شاهدته {userProductInteraction.viewed} مرة</span>
+              </div>
+            )}
+            {userProductInteraction.clicked > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-muted/40 px-3 py-2">
+                <ClickIcon className="h-4 w-4 text-blue-500" />
+                <span className="text-sm">نقر {userProductInteraction.clicked} مرة</span>
+              </div>
+            )}
+            {userProductInteraction.purchased > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-2">
+                <ShoppingBag className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm font-bold text-emerald-600">اشتريته!</span>
+              </div>
+            )}
+            {userProductInteraction.rating > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-purple-500/10 px-3 py-2">
+                <StarIcon className="h-4 w-4 text-purple-500" />
+                <span className="text-sm">قيّمته {userProductInteraction.rating}/5</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : isValidUser && !userProductInteraction ? (
+        <div className="mb-6 rounded-2xl border border-muted bg-muted/20 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+              <User className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                أنت تتصفح كمستخدم #{activeUserId}. لم تتفاعل مع هذا المنتج بعد.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <section className="mb-12 overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm">
         <div className="grid gap-0 md:grid-cols-2">
           <div
@@ -86,7 +155,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
 
             <h1 className="mb-2 text-3xl font-black text-foreground md:text-4xl">{product.name}</h1>
-            <p className="mb-6 text-muted-foreground">عند توفر Supabase تُقرأ هذه المؤشرات من القاعدة مباشرة وتُحدّث مع التتبع الحي.</p>
+            <p className="mb-6 text-muted-foreground">
+              {product.name} من فئة {product.category.name} - منتج مميز بجودة عالية وتقييم {product.rating.toFixed(1)}/5 من {product.rating_count} عملاء.
+            </p>
 
             <div className="mb-8 flex items-end gap-4">
               <span className="text-5xl font-black text-primary">${product.price}</span>
@@ -147,7 +218,63 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
       </section>
 
-      <section>
+      <RecommendationReason
+        productId={product.product_id}
+        categoryName={product.category.name}
+        categoryColor={product.category.color}
+        price={product.price}
+        rating={product.rating}
+        views={product.views}
+        clicks={product.clicks}
+        purchases={product.purchases}
+      />
+
+      <section className="mb-12 rounded-[2rem] border border-border bg-card p-8 shadow-sm">
+        <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-foreground">
+          <Package className="h-5 w-5 text-primary" />
+          مواصفات المنتج
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex items-center gap-3 rounded-xl bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Package className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">رقم المنتج</p>
+              <p className="text-xs text-muted-foreground">#{product.product_id}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Truck className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">الشحن</p>
+              <p className="text-xs text-muted-foreground">توصيل خلال 3-5 أيام</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Shield className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">الضمان</p>
+              <p className="text-xs text-muted-foreground">ضمان 14 يوم استبدال</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl bg-muted/30 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Star className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">التقييم</p>
+              <p className="text-xs text-muted-foreground">{product.rating.toFixed(1)}/5 ({product.rating_count} تقييم)</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-12">
         <h2 className="mb-6 text-2xl font-bold text-foreground">منتجات مشابهة قد تهمك</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
           {relatedProducts.map((relatedProduct) => (

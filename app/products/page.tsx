@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { ArrowUpDown, Filter, Search } from 'lucide-react';
+import { ArrowUpDown, Filter, Search, Sparkles } from 'lucide-react';
 
 import ProductCard from '@/components/ProductCard';
+import UserSelector from '@/components/UserSelector';
 import { PriceSlider } from "@/components/PriceSlider";
 import {
   CATEGORIES,
@@ -9,6 +10,7 @@ import {
   type ProductSort,
 } from '@/lib/data';
 import { filterProductsList, getCatalogSnapshot } from '@/lib/server/catalog';
+import { getUserInteractions, getUserRecommendations } from '@/lib/server/user-products';
 
 
 interface ProductsPageProps {
@@ -90,11 +92,71 @@ function buildProductsHref(
   return queryString ? `/products?${queryString}` : '/products';
 }
 
+function buildProductsHrefWithUser(
+  current: {
+    q: string;
+    categories: string[];
+    minPrice: number;
+    maxPrice: number;
+    minRating: number;
+    sort: ProductSort;
+    minAllowedPrice: number;
+    maxAllowedPrice: number;
+    user: number | null;
+  },
+  page: number,
+) {
+  const params = new URLSearchParams();
+
+  if (current.q) {
+    params.set('q', current.q);
+  }
+
+  for (const category of current.categories) {
+    params.append('category', category);
+  }
+
+  if (current.minPrice > current.minAllowedPrice) {
+    params.set('minPrice', String(current.minPrice));
+  }
+
+  if (current.maxPrice < current.maxAllowedPrice) {
+    params.set('maxPrice', String(current.maxPrice));
+  }
+
+  if (current.minRating) {
+    params.set('minRating', String(current.minRating));
+  }
+
+  if (current.sort !== 'default') {
+    params.set('sort', current.sort);
+  }
+
+  if (current.user) {
+    params.set('user', String(current.user));
+  }
+
+  if (page > 1) {
+    params.set('page', String(page));
+  }
+
+  const queryString = params.toString();
+  return queryString ? `/products?${queryString}` : '/products';
+}
+
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
   const { products, summary } = await getCatalogSnapshot();
   const maxAllowedPrice = Math.ceil(summary.pricing.max);
   const minAllowedPrice = Math.floor(summary.pricing.min);
+
+  const userIdParam = readSingleParam(params.user).trim();
+  const activeUserId = userIdParam ? Number(userIdParam) : null;
+  const isValidUser = activeUserId && activeUserId >= 1 && activeUserId <= summary.totalUsers;
+
+  // Fetch user data if a valid user is selected
+  const userInteractions = isValidUser ? await getUserInteractions(activeUserId) : null;
+  const userRecommendations = isValidUser ? await getUserRecommendations(activeUserId) : null;
 
   const q = readSingleParam(params.q).trim();
   const categories = readArrayParam(params.category).filter((categoryId) =>
@@ -147,7 +209,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-8 md:flex-row">
-        <aside className="w-full shrink-0 md:w-72">
+        <aside className="w-full shrink-0 md:w-72 space-y-6">
+          <UserSelector maxUserId={summary.totalUsers} />
+
           <form action="/products" className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="flex items-center gap-2 text-lg font-bold text-foreground">
               <Filter className="h-5 w-5" />
@@ -236,6 +300,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               </div>
             </div>
 
+            {activeUserId ? (
+              <input type="hidden" name="user" value={activeUserId} />
+            ) : null}
+
             <div className="flex gap-3">
               <button
                 type="submit"
@@ -244,7 +312,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 تطبيق
               </button>
               <Link
-                href="/products"
+                href={activeUserId ? `/products?user=${activeUserId}` : '/products'}
                 className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-border bg-background px-4 text-sm font-bold text-foreground transition hover:bg-muted"
               >
                 إعادة ضبط
@@ -254,11 +322,44 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </aside>
 
         <section className="flex-1">
+          {/* User Recommendations Section */}
+          {userRecommendations?.recommendations && userRecommendations.recommendations.length > 0 ? (
+            <div className="mb-8 rounded-[2rem] border border-emerald-500/20 bg-emerald-500/5 p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-emerald-500" />
+                <h2 className="font-bold text-foreground">موصى لك كمستخدم #{activeUserId}</h2>
+                <Link
+                  href={`/recommendations/${activeUserId}`}
+                  className="mr-auto text-sm text-emerald-600 hover:underline"
+                >
+                  عرض كل التوصيات &rarr;
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {userRecommendations.recommendations.slice(0, 3).map((item) => (
+                  <ProductCard
+                    key={item.product.product_id}
+                    product={item.product}
+                    interaction={{
+                      viewed: item.behavior.viewed,
+                      clicked: item.behavior.clicked,
+                      purchased: item.behavior.purchased,
+                      rating: item.behavior.rating,
+                      fitness: item.fitness,
+                    }}
+                    showFitness
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">جميع المنتجات</h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 عرض {pagination.data.length} من أصل {pagination.total} نتيجة
+                {userInteractions && userInteractions.hasUser ? ' (مع علامات تفاعلك)' : ''}
               </p>
             </div>
 
@@ -288,9 +389,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
           {pagination.data.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {pagination.data.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
-              ))}
+              {pagination.data.map((product) => {
+                const interaction = userInteractions?.interactions.get(product.product_id) ?? null;
+                return (
+                  <ProductCard
+                    key={product.product_id}
+                    product={product}
+                    interaction={interaction}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-card px-6 py-20 text-center">
@@ -306,7 +414,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
               {pagination.currentPage > 1 ? (
                 <Link
-                  href={buildProductsHref(currentFilters, pagination.currentPage - 1)}
+                  href={buildProductsHrefWithUser({ ...currentFilters, user: activeUserId }, pagination.currentPage - 1)}
                   className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-background px-4 text-sm font-medium text-foreground transition hover:bg-muted"
                 >
                   السابق
@@ -323,7 +431,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       <span className="px-2 text-sm text-muted-foreground">…</span>
                     ) : null}
                     <Link
-                      href={buildProductsHref(currentFilters, pageNumber)}
+                      href={buildProductsHrefWithUser({ ...currentFilters, user: activeUserId }, pageNumber)}
                       className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold transition ${
                         pageNumber === pagination.currentPage
                           ? 'bg-primary text-primary-foreground'
@@ -338,7 +446,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
               {pagination.currentPage < pagination.totalPages ? (
                 <Link
-                  href={buildProductsHref(currentFilters, pagination.currentPage + 1)}
+                  href={buildProductsHrefWithUser({ ...currentFilters, user: activeUserId }, pagination.currentPage + 1)}
                   className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-background px-4 text-sm font-medium text-foreground transition hover:bg-muted"
                 >
                   التالي

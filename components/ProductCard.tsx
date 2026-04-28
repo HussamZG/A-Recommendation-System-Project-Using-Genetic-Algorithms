@@ -3,10 +3,22 @@ import { ExternalLink, ShoppingBag, Star } from 'lucide-react';
 
 import type { Product } from '@/lib/data';
 import CategoryBadge from './CategoryBadge';
+import { UserInteractionBadges } from './UserSelector';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 
+interface ProductCardProps {
+  product: Product;
+  interaction?: {
+    viewed: number;
+    clicked: number;
+    purchased: number;
+    rating: number;
+    fitness?: number;
+  } | null;
+  showFitness?: boolean;
+}
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, interaction = null, showFitness = false }: ProductCardProps) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden border border-border/70 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <Link
@@ -17,6 +29,14 @@ export default function ProductCard({ product }: { product: Product }) {
           className="absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-30"
           style={{ background: `radial-gradient(circle at center, ${product.category.color}, transparent 70%)` }}
         />
+        {interaction && (
+          <UserInteractionBadges
+            viewed={interaction.viewed}
+            clicked={interaction.clicked}
+            purchased={interaction.purchased}
+            rating={interaction.rating}
+          />
+        )}
         <div
           className="flex h-28 w-28 items-center justify-center rounded-2xl text-5xl font-black text-white shadow-lg transition-transform duration-500 group-hover:rotate-0"
           style={{
@@ -60,6 +80,12 @@ export default function ProductCard({ product }: { product: Product }) {
             <p className="mt-1 font-bold text-foreground">{product.purchases}</p>
           </div>
         </div>
+        {showFitness && interaction?.fitness !== undefined && (
+          <div className="mt-2 rounded-xl bg-primary/10 px-3 py-2 text-center">
+            <p className="text-xs text-muted-foreground">درجة الملاءمة</p>
+            <p className="mt-1 text-sm font-bold text-primary">{interaction.fitness} / 23</p>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-3 border-t bg-muted/20 p-5">
