@@ -1,7 +1,9 @@
+// مكونات البطاقة (Card): بطاقة، رأس، عنوان، وصف، إجراء، محتوى، وتذييل — من مكتبة shadcn/ui
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+// بطاقة رئيسية: حاوية مرنة تدعم حجمين (default / sm) مع حدود وظل خفيف
 function Card({
   className,
   size = "default",
@@ -20,6 +22,7 @@ function Card({
   )
 }
 
+// رأس البطاقة: شبكة مرنة تدعم الإجراءات والأوصاف الجانبية
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -33,6 +36,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// عنوان البطاقة: خط عريض بحجم يتكيف مع حجم البطاقة
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -46,6 +50,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// وصف البطاقة: نص ثانوي بلون خافت
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -56,6 +61,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// إجراء البطاقة: عنصر جانبي في رأس البطاقة (مثل زر أو قائمة)
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -69,6 +75,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// محتوى البطاقة: منطقة المحتوى الرئيسية مع هوامش أفقية
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -79,6 +86,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+// تذييل البطاقة: شريط سفلي بخلفية خافتة وحد علوي
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

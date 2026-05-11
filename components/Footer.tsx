@@ -1,3 +1,4 @@
+// تذييل الموقع: يعرض اسم الفريق وأعضاء المشروع مع حقوق النشر
 export default function Footer() {
   return (
     <footer className="mt-auto border-t bg-muted/60 py-8 text-center text-muted-foreground">

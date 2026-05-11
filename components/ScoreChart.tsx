@@ -3,12 +3,14 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 
+// رسم بياني يُظهر تطور أفضل درجة لياقة (Fitness) عبر الأجيال الـ 45 للخوارزمية الجينية
 export default function ScoreChart({ scoreHistory }: { scoreHistory: number[] }) {
   const data = scoreHistory.map((score, index) => ({
     generation: `جيل ${index + 1}`,
     value: score,
   }));
 
+  // تحديد نطاق المحور Y: أعلى قيمة + 2 وأدنى قيمة - 5 لضمان مساحة عرض مريحة
   const chartMax = Math.max(10, ...scoreHistory) + 2;
   const chartMin = Math.max(0, Math.min(...scoreHistory) - 5);
 

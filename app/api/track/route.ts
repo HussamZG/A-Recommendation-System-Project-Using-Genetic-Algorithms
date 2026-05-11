@@ -12,16 +12,19 @@ import { createClient as createSupabaseClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 
 
+// دالة تحقق من نوع الحدث: تضمن أن القيمة المُرسلة هي إحدى الأنواع الثلاثة (view, click, purchase)
 function isTrackEvent(value: unknown): value is TrackEvent {
   return value === "view" || value === "click" || value === "purchase";
 }
 
+// نقطة نهاية API لتسجيل حدث سلوكي (مشاهدة/نقر/شراء) على منتج معين لمستخدم نشط
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   const activeUserId = parseActiveUserId(
     cookieStore.get(ACTIVE_USER_COOKIE)?.value,
   );
 
+  // التحقق من وجود مستخدم نشط محفوظ في الكوكي
   if (!activeUserId) {
     return NextResponse.json(
       { message: "اختر رقم مستخدم أولاً لبدء تتبّع السلوك." },
@@ -29,10 +32,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = await request.json().catch(() => null);
-  const productId = Number(body?.productId);
-  const event = body?.event;
+  const body = await request.json().catch(() => null); // قراءة جسم الطلب JSON
+  const productId = Number(body?.productId); // استخراج معرّف المنتج
+  const event = body?.event; // استخراج نوع الحدث
 
+  // التحقق من صحة البيانات: المنتج يجب أن يكون عدداً صحيحاً موجباً والحدث من الأنواع المسموحة
   if (!Number.isInteger(productId) || productId <= 0 || !isTrackEvent(event)) {
     return NextResponse.json(
       { message: "بيانات التتبع غير صالحة." },
@@ -40,8 +44,10 @@ export async function POST(request: Request) {
     );
   }
 
+  // استخدام عميل الإدارة إن وُجد، وإلا يُستخدم عميل الخادم العادي مع الكوكيز
   const supabase = createAdminClient() ?? (await createSupabaseClient(cookieStore));
 
+  // جلب بيانات المنتج والتفاعل الحالي للمستخدم بشكل متوازٍ (Parallel) من Supabase
   const [productResult, interactionResult] = await Promise.all([
     supabase
       .from("products")
@@ -85,6 +91,7 @@ export async function POST(request: Request) {
     );
   }
 
+  // حساب حالة التفاعل التالية بعد تطبيق الحدث الجديد (زيادة العداد المناسب)
   const nextInteraction = applyTrackEvent(
     {
       viewed: interactionResult.data?.viewed ?? 0,
@@ -95,6 +102,7 @@ export async function POST(request: Request) {
     event,
   );
 
+  // حساب عدادات المنتج العالمية التالية بعد تطبيق الحدث الجديد
   const nextProductCounters = applyTrackEventToProduct(
     {
       views: productResult.data.views ?? 0,
@@ -104,8 +112,10 @@ export async function POST(request: Request) {
     event,
   );
 
+  // إعادة حساب درجة اللياقة (Fitness) للتفاعل المُحدّث
   const fitness = calculateFitness(nextInteraction);
 
+  // حفظ التفاعل المُحدّث والعدادات العالمية للمنتج في Supabase بشكل متوازٍ
   const [upsertInteractionResult, updateProductResult] = await Promise.all([
     supabase.from("interactions").upsert(
       {

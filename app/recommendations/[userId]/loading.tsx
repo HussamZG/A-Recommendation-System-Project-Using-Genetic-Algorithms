@@ -1,6 +1,7 @@
 import { Dna } from 'lucide-react';
 
 
+// حالة التحميل (Skeleton) أثناء تشغيل الخوارزمية الجينية: تعرض رسوماً متحركة لإعلام المستخدم بالمعالجة
 export default function LoadingRecommendationPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">

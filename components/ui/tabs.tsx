@@ -1,3 +1,4 @@
+// تبويبات (Tabs): تبديل المحتوى بين ألسنة متعددة مع متغيرات (default/line) — من shadcn/ui
 "use client"
 
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"

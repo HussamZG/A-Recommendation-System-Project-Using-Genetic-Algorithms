@@ -13,12 +13,14 @@ interface ProductActionButtonsProps {
   productName: string;
 }
 
+// أزرار تفاعل المنتج (إضافة للسلة / متابعة): تُرسل حدثاً للـ API لتتبع السلوك في Supabase
 export default function ProductActionButtons({
   productId,
   productName,
 }: ProductActionButtonsProps) {
   const [pendingEvent, setPendingEvent] = useState<TrackEvent | null>(null);
 
+  // إرسال حدث تتبع (view/click/purchase) للخادم عبر API، مع التحقق من وجود مستخدم نشط
   async function trackProduct(event: TrackEvent) {
     if (!getActiveUserIdFromDocument()) {
       toast.error('اختر المستخدم أولاً', {

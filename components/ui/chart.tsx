@@ -1,3 +1,4 @@
+// حاوية الرسم البياني (ChartContainer): تُولّد متغيرات CSS للألوان من الإعدادات — من shadcn/ui
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
@@ -8,7 +9,7 @@ interface ChartContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
   ({ className, children, config, ...props }, ref) => {
-    // Generate CSS variables for chart colors
+    // توليد متغيرات CSS (--color-*) من كائن الإعدادات لتلوين سلاسل البيانات
     const style = React.useMemo(() => {
       const styleObj: Record<string, string> = {}
       Object.entries(config).forEach(([key, value]) => {

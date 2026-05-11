@@ -1,5 +1,7 @@
+// اسم الكوكي المستخدم لتذكر المستخدم النشط الحالي عبر الجلسات
 export const ACTIVE_USER_COOKIE = "active_user_id";
 
+// تحليل معرّف المستخدم النشط: يتحقق أن القيمة عدد صحيح موجب، وإلا يُرجع null
 export function parseActiveUserId(value?: string | null) {
   const parsedValue = Number(value);
 
@@ -10,6 +12,7 @@ export function parseActiveUserId(value?: string | null) {
   return parsedValue;
 }
 
+// جلب معرّف المستخدم النشط من الكوكي أولاً، وإن لم يُوجد يُحاول من التخزين المحلي (localStorage)
 export function getActiveUserIdFromDocument() {
   if (typeof document === "undefined") {
     return null;
@@ -34,6 +37,7 @@ export function getActiveUserIdFromDocument() {
   }
 }
 
+// حفظ معرّف المستخدم النشط في كوكي (لمدة 30 يوماً) وفي التخزين المحلي لضمان استمراريته
 export function rememberActiveUser(userId: number) {
   if (typeof document === "undefined") {
     return;

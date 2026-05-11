@@ -1,3 +1,4 @@
+// قائمة التنقل (NavigationMenu): شريط تنقل هرمي مع قوائم منسدلة ومؤشر — من shadcn/ui
 import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/navigation-menu"
 import { cva } from "class-variance-authority"
 

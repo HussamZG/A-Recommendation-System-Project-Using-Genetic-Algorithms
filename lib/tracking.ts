@@ -1,5 +1,7 @@
+// أنواع الأحداث القابلة للتتبع: مشاهدة، نقر، أو عملية شراء
 export type TrackEvent = "view" | "click" | "purchase";
 
+// مقاييس التفاعل بين مستخدم ومنتج: عدد المشاهدات، النقرات، المشتريات، والتقييم
 export interface InteractionMetrics {
   viewed: number;
   clicked: number;
@@ -7,6 +9,7 @@ export interface InteractionMetrics {
   rating: number;
 }
 
+// دالة حساب درجة اللياقة (Fitness) لكل تفاعل: معادلة مرجّحة تعطي أولوية أعلى للمشتريات (×5) ثم النقرات (×2) ثم المشاهدات والتقييم
 export function calculateFitness({
   viewed,
   clicked,
@@ -16,6 +19,7 @@ export function calculateFitness({
   return (purchased * 5) + (clicked * 2) + viewed + (rating * 3);
 }
 
+// تحديث مقاييس التفاعل بناءً على حدث جديد: زيادة عداد المشاهدة، النقرة، أو الشراء
 export function applyTrackEvent(
   current: InteractionMetrics,
   event: TrackEvent,
@@ -41,12 +45,14 @@ export function applyTrackEvent(
   };
 }
 
+// عدادات عالمية للمنتج: تُستخدم لتحديث إجمالي المشاهدات، النقرات، والمبيعات على مستوى المتجر
 export interface ProductCounters {
   views: number;
   clicks: number;
   purchases: number;
 }
 
+// تحديث عدادات المنتج العالمية بناءً على حدث جديد: زيادة views/clicks/purchases للمنتج
 export function applyTrackEventToProduct(
   current: ProductCounters,
   event: TrackEvent,

@@ -1,8 +1,9 @@
-"server-only";
+"server-only"; // يضمن تنفيذ هذا الملف فقط على الخادم لحماية بيانات المستخدمين وتفاعلاتهم
 
 import { getCatalogSnapshot } from "./catalog";
 import { getRecommendationPayload } from "./recommender";
 
+// جلب تفاعلات مستخدم معين من لقطة الكتالوج وتنظيمها في خريطة (Map) للوصول السريع
 export async function getUserInteractions(userId: number) {
   const catalog = await getCatalogSnapshot();
   const interactions = catalog.interactionsByUser.get(userId) ?? [];
@@ -31,6 +32,7 @@ export async function getUserInteractions(userId: number) {
   };
 }
 
+// جلب التوصيات المُحسّنة للمستخدم باستخدام الخوارزمية الجينية (GA) وإعادة ترتيبها
 export async function getUserRecommendations(userId: number) {
   const payload = await getRecommendationPayload(userId);
   if (!payload) {

@@ -1,3 +1,4 @@
+// مكون الإشعارات (Toaster): يعرض إشعارات success/info/warning/error/loading مع ألوان تتبع الوضع الليلي — من shadcn/ui
 "use client"
 
 import { useTheme } from "next-themes"
@@ -28,6 +29,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           <Loader2Icon className="size-4 animate-spin" />
         ),
       }}
+// تمرير ألوان النظام (popover/border/radius) كمتغيرات CSS ليتوافق الإشعار مع الثيم
       style={
         {
           "--normal-bg": "var(--popover)",

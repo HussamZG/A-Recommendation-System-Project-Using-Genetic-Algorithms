@@ -1,3 +1,4 @@
+// مسار التنقل (Breadcrumb): قائمة هرمية من الروابط تفيد في معرفة موقع الصفحة الحالية — من shadcn/ui
 import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"

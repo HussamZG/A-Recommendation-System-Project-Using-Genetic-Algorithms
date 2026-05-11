@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// هيكل عظمي (Skeleton) لبطاقة المنتج: يُعرض أثناء انتظار جلب البيانات من الخادم
 export default function ProductCardSkeleton() {
   return (
     <Card className="flex h-full flex-col overflow-hidden border border-border/70 bg-card">

@@ -10,6 +10,7 @@ interface PriceSliderProps {
   minAllowedPrice: number;
 }
 
+// شريط تمرير نطاق السعر: يتيح للمستخدم تحديد الحد الأدنى والأعلى للسعر مع إرسال قيم فقط إن اختلفت عن الافتراضي
 export function PriceSlider({ minPrice, maxPrice, maxAllowedPrice, minAllowedPrice }: PriceSliderProps) {
   const [value, setValue] = useState([minPrice, maxPrice]);
 
@@ -19,7 +20,7 @@ export function PriceSlider({ minPrice, maxPrice, maxAllowedPrice, minAllowedPri
     }
   };
 
-  // Only send values if they differ from defaults
+  // إرسال قيم السعر فقط إن اختلفت عن الحد الافتراضي (لتجنب تلويث URL بقيم افتراضية)
   const shouldSendMinPrice = value[0] > minAllowedPrice;
   const shouldSendMaxPrice = value[1] < maxAllowedPrice;
 

@@ -1,3 +1,4 @@
+// صورة المستخدم (Avatar): صورة شخصية مع أحجام (sm/default/lg) وبديل نصي وشارة ومجموعة — من shadcn/ui
 "use client"
 
 import * as React from "react"

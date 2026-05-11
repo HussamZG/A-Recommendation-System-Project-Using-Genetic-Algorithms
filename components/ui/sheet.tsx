@@ -1,3 +1,4 @@
+// لوحة جانبية (Sheet): نافذة منزلقة من حافة الشاشة (يمين/يسار/أعلى/أسفل) — من shadcn/ui
 "use client"
 
 import * as React from "react"

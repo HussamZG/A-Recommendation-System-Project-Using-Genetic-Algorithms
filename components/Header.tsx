@@ -4,6 +4,7 @@ import { LayoutDashboard, Menu, Package, Search, Sparkles } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 
 
+// نموذج البحث السريع في الشريط العلوي: يُرسل استعلام البحث إلى صفحة المنتجات
 function SearchForm({ compact = false }: { compact?: boolean }) {
   return (
     <form action="/products" className={`relative ${compact ? 'w-full' : 'w-72'}`}>
@@ -18,6 +19,7 @@ function SearchForm({ compact = false }: { compact?: boolean }) {
   );
 }
 
+// شريط التنقل العلوي الرئيسي: يحتوي على الشعار، روابط التنقل، محرك البحث، وتبديل الوضع الليلي
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">

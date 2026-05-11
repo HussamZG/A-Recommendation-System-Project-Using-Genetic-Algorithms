@@ -1,7 +1,9 @@
+// شريط درجة اللياقة (Fitness): يعرض الدرجة من 23 مع ألوان متدرجة حسب القوة (أحمر→برتقالي→أصفر→أخضر)
 export default function FitnessBar({ score }: { score: number }) {
   const maxScore = 23;
   const percentage = Math.min(100, Math.max(0, (score / maxScore) * 100));
 
+  // اختيار اللون بناءً على النسبة المئوية (>70% أخضر، >40% أصفر، >10% برتقالي، else أحمر)
   let barColor = '#ef4444';
   let textColor = 'text-red-500';
 

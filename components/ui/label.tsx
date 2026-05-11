@@ -1,3 +1,4 @@
+// تسمية (Label): عنصر <label> مع تنسيق موحد ودعم تعطيل — من shadcn/ui
 "use client"
 
 import * as React from "react"

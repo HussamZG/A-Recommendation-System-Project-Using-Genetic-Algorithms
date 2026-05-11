@@ -1,4 +1,4 @@
-import "server-only";
+import "server-only"; // يضمن تنفيذ هذا الملف فقط على الخادم (Server-Side) لحماية منطق التوصية
 
 import {
   getCatalogSnapshot,
@@ -9,6 +9,7 @@ import {
 import type { Product, User } from "@/lib/data";
 
 
+// ملف تعريف المستخدم: يخزّن تفاعلاته المُحلّلة لاستخلاص تفضيلاته (الفئة المفضلة، السعر المفضل)
 interface UserProfile {
   interactions: InteractionRecord[];
   interactionByProduct: Map<number, InteractionRecord>;
@@ -20,6 +21,7 @@ interface UserProfile {
   favoriteCategories: Set<string>;
 }
 
+// إحصائيات عامة لجميع المنتجات: تُستخدم لتطبيع (Normalize) الدرجات عند مقارنة المنتجات ببعضها
 interface ProductStats {
   priceMin: number;
   priceMax: number;
@@ -29,6 +31,7 @@ interface ProductStats {
   maxViews: number;
 }
 
+// عنصر توصية واحد: يجمع بين بيانات المنتج ودرجة ملاءمته المحسوبة للمستخدم
 export interface RecommendationItem {
   product: Product;
   behavior: {
@@ -41,6 +44,7 @@ export interface RecommendationItem {
   fitness: number;
 }
 
+// عنصر من سجل تاريخ المستخدم: يُظهر تفاعلاته السابقة مع منتج معين
 export interface UserHistoryItem {
   product: Product;
   viewed: number;
@@ -50,6 +54,7 @@ export interface UserHistoryItem {
   fitness: number;
 }
 
+// الاستجابة النهائية لطلب التوصية: تحتوي على القائمة المُحسّنة + إحصائيات الأجيال
 export interface RecommendationResponse {
   user: User;
   recommendations: RecommendationItem[];
@@ -70,6 +75,7 @@ export interface RecommendationResponse {
   };
 }
 
+// مولد أرقام شبه عشوائية (PRNG) مُعتمَد على بذرة (Seed): يضمن تكرارية النتائج لنفس المستخدم
 function createRandom(seed: number) {
   let state = seed >>> 0;
 
@@ -82,10 +88,12 @@ function createRandom(seed: number) {
   };
 }
 
+// توليد عدد صحيح عشوائي بين حدين (شامل): min و max
 function randomInt(random: () => number, min: number, max: number) {
   return Math.floor(random() * (max - min + 1)) + min;
 }
 
+// اختيار عينة عشوائية فريدة (بدون تكرار) باستخدام خوارزمية خلط Fisher-Yates
 function sampleUnique(values: number[], count: number, random: () => number) {
   const pool = [...values];
 
@@ -97,6 +105,7 @@ function sampleUnique(values: number[], count: number, random: () => number) {
   return pool.slice(0, count);
 }
 
+// بناء إحصائيات المنتجات: يُحسب أدنى/أعلى/متوسط السعر + أقصى عدد مشتريات/نقرات/مشاهدات لتطبيع الشعبية
 function buildProductStats(products: Product[]): ProductStats {
   return {
     priceMin: Math.min(...products.map((product) => product.price)),
@@ -108,6 +117,7 @@ function buildProductStats(products: Product[]): ProductStats {
   };
 }
 
+// بناء ملف تعريف المستخدم: يحلّل سجل تفاعلاته لاستخراج الفئات المفضلة (بأوزانها) والسعر المفضل المُرجّح
 function buildUserProfile(userId: number, catalog: CatalogSnapshot, productStats: ProductStats): UserProfile {
   const interactions = catalog.interactionsByUser.get(userId) ?? [];
   const interactionByProduct = new Map<number, InteractionRecord>();
@@ -162,6 +172,7 @@ function buildUserProfile(userId: number, catalog: CatalogSnapshot, productStats
   };
 }
 
+// حساب درجة ملاءمة منتج واحد للمستخدم: مجموع مرجّح لملاءمة الفئة (8) + السعر (4) + الشعبية (4) + التقييم (3) + مكافآت
 function getCandidateScore(product: Product, profile: UserProfile, productStats: ProductStats) {
   const hasHistory = profile.categoryWeights.size > 0;
   const categoryAffinity = hasHistory
@@ -195,6 +206,7 @@ function getCandidateScore(product: Product, profile: UserProfile, productStats:
   return Math.max(1, Math.min(23, rawScore));
 }
 
+// دالة اللياقة (Fitness Function): تقيّم مجموعة كاملة (فرد) بناءً على مجموع درجات منتجاتها + تنوع الفئات (+2) - تكرار الفئات (-3)
 function evaluate(
   individual: number[],
   candidateScores: Map<number, number>,
@@ -224,6 +236,7 @@ function evaluate(
   return score + (uniqueCategories * 2) - (duplicateCategoryCount * 3);
 }
 
+// عملية الانتقاء (Selection): الاحتفاظ بأفضل نسبة (افتراضياً 50%) من المجتمع الحالي بناءً على درجات اللياقة
 function selection(population: number[][], scores: number[], keepRatio: number = 0.5) {
   const keepCount = Math.max(2, Math.floor(population.length * keepRatio));
 
@@ -234,6 +247,7 @@ function selection(population: number[][], scores: number[], keepRatio: number =
     .map((item) => item.individual);
 }
 
+// عملية التهجين (Crossover): دمج جزء من الأب الأول مع باقي الأم الثانية لإنتاج ابن جديد بدون تكرار منتجات
 function crossover(parent1: number[], parent2: number[], topN: number, random: () => number) {
   const point = randomInt(random, 1, topN - 1);
   const child = parent1.slice(0, point);
@@ -251,6 +265,7 @@ function crossover(parent1: number[], parent2: number[], topN: number, random: (
   return child;
 }
 
+// عملية الطفرة (Mutation): استبدال منتج عشوائي داخل المجموعة بآخر جديد بنسبة معينة لتجنب الوقوع في الحلول المحلية (Local Optima)
 function mutate(
   individual: number[],
   allProducts: number[],
@@ -273,6 +288,7 @@ function mutate(
   return mutated;
 }
 
+// بناء مجموعة المرشحين (Candidate Pool): تصفية المنتجات غير المشتراة/غير المشاهدة ثم ترتيبها تنازلياً حسب الدرجة
 function buildCandidatePool(
   profile: UserProfile,
   catalog: CatalogSnapshot,
@@ -318,32 +334,34 @@ function buildCandidatePool(
   };
 }
 
+// المحرك الرئيسي للخوارزمية الجينية: يُنفّذ دورات التطور (أجيال) لاكتشاف أفضل تشكيلة من المنتجات للمستخدم
 function geneticRecommendation(
   userId: number,
   catalog: CatalogSnapshot,
   options?: {
-    topN?: number;
-    populationSize?: number;
-    generations?: number;
-    mutationRate?: number;
-    seed?: number;
+    topN?: number;          // عدد التوصيات النهائية
+    populationSize?: number; // حجم المجتمع (عدد المجموعات في كل جيل)
+    generations?: number;   // عدد الأجيال (دورات التطور)
+    mutationRate?: number;  // نسبة حدوث الطفرة (0.12 = 12%)
+    seed?: number;          // البذرة لتكرارية المولد العشوائي
   },
 ) {
-  const topN = options?.topN ?? 5;
-  const populationSize = options?.populationSize ?? 24;
-  const generations = options?.generations ?? 45;
-  const mutationRate = options?.mutationRate ?? 0.12;
-  const random = createRandom(options?.seed ?? userId);
-  const productStats = buildProductStats(catalog.products);
+  const topN = options?.topN ?? 5;            // عدد المنتجات المُوصى بها (5 افتراضياً)
+  const populationSize = options?.populationSize ?? 24; // حجم المجتمع: 24 مجموعة مختلفة في كل جيل
+  const generations = options?.generations ?? 45;  // عدد الأجيال: 45 جيلاً من التطور والتحسين
+  const mutationRate = options?.mutationRate ?? 0.12; // نسبة الطفرة: 12% لكل ابن جديد
+  const random = createRandom(options?.seed ?? userId); // مولد مُبذور بمعرّف المستخدم لتكرارية النتائج
+  const productStats = buildProductStats(catalog.products); // إحصائيات المنتجات للتطبيع
 
-  const profile = buildUserProfile(userId, catalog, productStats);
-  const { candidateScores, eligibleProductIds } = buildCandidatePool(
+  const profile = buildUserProfile(userId, catalog, productStats); // تحليل تفضيلات المستخدم
+  const { candidateScores, eligibleProductIds } = buildCandidatePool( // بناء مجموعة المرشحين المؤهلين
     profile,
     catalog,
     productStats,
     topN,
   );
 
+  // إذا كان عدد المرشحين قليلاً جداً (أقل أو يساوي topN)، نُرجع أفضلهم مباشرة دون الحاجة لخوارزمية جينية
   if (eligibleProductIds.length <= topN) {
     const bestProducts = eligibleProductIds.slice(0, topN);
     const bestScore = evaluate(bestProducts, candidateScores, catalog);
@@ -356,29 +374,32 @@ function geneticRecommendation(
     };
   }
 
+  // تهيئة المجتمع الأولي: توليد مجموعات عشوائية فريدة من المرشحين (كل مجموعة = فرد)
   let population = Array.from({ length: populationSize }, () =>
     sampleUnique(eligibleProductIds, topN, random),
   );
 
-  const scoreHistory: number[] = [];
+  const scoreHistory: number[] = []; // سجل أعلى درجة لياقة في كل جيل (للتتبع والرسوم البيانية)
 
+  // حلقة الأجيال الرئيسية: كل جيل يُقيّم المجتمع، يُنتقي الأفضل، يُهجنهم، ويطبّق الطفرات
   for (let generation = 0; generation < generations; generation += 1) {
-    const scores = population.map((individual) => evaluate(individual, candidateScores, catalog));
-    scoreHistory.push(Math.max(...scores));
+    const scores = population.map((individual) => evaluate(individual, candidateScores, catalog)); // تقييم كل مجموعة
+    scoreHistory.push(Math.max(...scores)); // تسجيل أفضل درجة في هذا الجيل
 
-    const parents = selection(population, scores);
-    const newPopulation = [...parents];
+    const parents = selection(population, scores); // انتقاء الأباء الأقوياء (أفضل 50%)
+    const newPopulation = [...parents]; // بدء جيل جديد بالأباء
 
+    // إعادة ملء المجتمع بالأبناء (Crossover + Mutation) حتى يصل لحجمه الأصلي
     while (newPopulation.length < populationSize) {
-      const firstParent = parents[randomInt(random, 0, parents.length - 1)];
-      let secondParent = parents[randomInt(random, 0, parents.length - 1)];
+      const firstParent = parents[randomInt(random, 0, parents.length - 1)]; // اختيار أب عشوائي
+      let secondParent = parents[randomInt(random, 0, parents.length - 1)]; // اختيار أم عشوائية
 
       while (secondParent === firstParent && parents.length > 1) {
-        secondParent = parents[randomInt(random, 0, parents.length - 1)];
+        secondParent = parents[randomInt(random, 0, parents.length - 1)]; // تجنب اختيار نفس الأب
       }
 
       const child = mutate(
-        crossover(firstParent, secondParent, topN, random),
+        crossover(firstParent, secondParent, topN, random), // تهجين الأبين لإنتاج ابن
         eligibleProductIds,
         mutationRate,
         random,
@@ -386,9 +407,10 @@ function geneticRecommendation(
       newPopulation.push(child);
     }
 
-    population = newPopulation;
+    population = newPopulation; // الانتقال للجيل التالي
   }
 
+  // بعد انتهاء الأجيال: تقييم المجتمع النهائي واختيار الفرد ذي أعلى درجة لياقة
   const finalScores = population.map((individual) => evaluate(individual, candidateScores, catalog));
   const bestScore = Math.max(...finalScores);
   const bestIndex = finalScores.indexOf(bestScore);
@@ -402,6 +424,7 @@ function geneticRecommendation(
   };
 }
 
+// تجميع بيانات منتج مقترح في كائن RecommendationItem: يجمع المنتج + سلوك المستخدم + درجة الملاءمة
 function buildRecommendationItem(
   productId: number,
   profile: UserProfile,
@@ -428,6 +451,7 @@ function buildRecommendationItem(
   };
 }
 
+// نقطة الدخول الرئيسية (API): تجلب لقطة الكتالوج وتُشغل GA ثم تُجهز الاستجابة النهائية مع المنتجات ذات الصلة
 export async function getRecommendationPayload(userId: number): Promise<RecommendationResponse | null> {
   const catalog = await getCatalogSnapshot();
   const user = catalog.usersById.get(userId) ?? null;

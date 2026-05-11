@@ -1,3 +1,4 @@
+// تنبيه (Alert): رسالة تنبيه مع متغيرات (default/destructive) وعنوان ووصف وإجراء — من shadcn/ui
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

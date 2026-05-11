@@ -1,4 +1,4 @@
-import "server-only";
+import "server-only"; // يضمن تنفيذ هذا الملف فقط على الخادم لحماية اتصالات قاعدة البيانات والبيانات الحساسة
 
 import {
   hydrateProduct,
@@ -11,6 +11,7 @@ import { createClient as createSupabaseClient } from "@/utils/supabase/server";
 import { unstable_noStore as noStore } from "next/cache";
 
 
+// سجل تفاعل واحد بين مستخدم ومنتج: يُخزّن المشاهدات، النقرات، المشتريات، التقييم، ودرجة اللياقة المحسوبة
 export interface InteractionRecord {
   user_id: number;
   product_id: number;
@@ -21,6 +22,7 @@ export interface InteractionRecord {
   fitness: number;
 }
 
+// ملخص إحصائي شامل للمتجر: يجمع أعداد المستخدمين والمنتجات وتوزيع التقييمات ومعدلات التحويل
 export interface SummaryData {
   totalUsers: number;
   totalProducts: number;
@@ -65,6 +67,7 @@ export interface SummaryData {
   }>;
 }
 
+// لقطة شاملة من الكتالوج: تحتوي على جميع المستخدمين والمنتجات والتفاعلات مُهيكّلة للوصول السريع (Map)
 export interface CatalogSnapshot {
   users: User[];
   usersById: Map<number, User>;
@@ -94,6 +97,7 @@ interface ProductRow {
   purchases: number;
 }
 
+// ترجمة أسماء الدول للعربية لتُعرض في واجهة المستخدم
 const COUNTRY_LABELS: Record<string, string> = {
   Jordan: "الأردن",
   UAE: "الإمارات",
@@ -104,6 +108,7 @@ const COUNTRY_LABELS: Record<string, string> = {
   Kuwait: "الكويت",
 };
 
+// التحقق مما إذا كانت متغيرات البيئة الخاصة بـ Supabase مُعيّنة لتفعيل اتصال قاعدة البيانات
 function isSupabaseConfigured() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -111,6 +116,7 @@ function isSupabaseConfigured() {
   );
 }
 
+// ترجمة دولة المستخدم للعربية باستخدام COUNTRY_LABELS
 function hydrateUser(record: UserRow): User {
   return {
     ...record,
@@ -118,6 +124,7 @@ function hydrateUser(record: UserRow): User {
   };
 }
 
+// تطبيع (Normalize) سجل تفاعل: تحويل جميع الحقول لأرقام وإعطائها قيم افتراضية (0) لتجنب undefined
 function normalizeInteractionRecord(record: Partial<InteractionRecord>) {
   return {
     user_id: Number(record.user_id ?? 0),
@@ -130,6 +137,7 @@ function normalizeInteractionRecord(record: Partial<InteractionRecord>) {
   };
 }
 
+// مطابقة نص البحث مع منتج: تبحث في الاسم، الفئة، والمعرّف مع تجاهل حالة الأحرف والرموز (#)
 function matchesQuery(product: Product, query: string) {
   const normalizedQuery = query.trim().toLowerCase().replace(/#/g, '');
   if (!normalizedQuery) {
@@ -149,6 +157,7 @@ function matchesQuery(product: Product, query: string) {
   return tokens.every((token) => haystack.includes(token));
 }
 
+// بناء الملخص الإحصائي للمتجر: يُحسب توزيع الفئات، التقييمات، معدلات التحويل (funnel)، والمنتجات الأكثر مبيعاً
 function buildSummary(
   users: User[],
   products: Product[],
@@ -252,6 +261,7 @@ function buildSummary(
   };
 }
 
+// بناء لقطة الكتالوج: تنظيم البيانات في خرائط (Map) لتسريع الوصول بالمعرّف وتجميع التفاعلات حسب المستخدم
 function buildSnapshot(
   users: User[],
   products: Product[],
@@ -281,6 +291,7 @@ function buildSnapshot(
   };
 }
 
+// جلب بيانات جدول من Supabase بشكل متكرر (Paginated): يستخدم تقسيم الصفحات بـ 1000 سطر في كل مرة
 async function fetchTableRows<T extends object>(
   table: string,
   selectQuery: string,
@@ -323,6 +334,7 @@ async function fetchTableRows<T extends object>(
   return { data: rows, error: null };
 }
 
+// جلب اللقطة الكاملة من Supabase: مستخدمون + منتجات + تفاعلات، مع fallback للبيانات المحلية عند الفشل
 async function fetchSupabaseSnapshot() {
   if (!isSupabaseConfigured()) {
     return null;
@@ -359,6 +371,7 @@ async function fetchSupabaseSnapshot() {
   }
 }
 
+// الحصول على لقطة الكتالوج: تُلغي التخزين المؤقت (noStore) لضمان بيانات حية من Supabase
 export async function getCatalogSnapshot() {
   noStore();
 
@@ -370,6 +383,7 @@ export async function getCatalogSnapshot() {
   return supabaseSnapshot;
 }
 
+// حساب متوسط التقييم المرجح: يُجمع كل تقييم مضروباً بعدد مرات حصوله ثم يقسم على إجمالي عدد التقييمات
 export function calculateAverageRating(summary: SummaryData) {
   const totalRatings = summary.ratingDistribution.reduce(
     (sum, bucket) => sum + bucket.count,
@@ -388,6 +402,7 @@ export function calculateAverageRating(summary: SummaryData) {
   return Number((weightedTotal / totalRatings).toFixed(1));
 }
 
+// تصفية وفرز قائمة المنتجات: تدعم البحث النصي، الفئات، نطاق السعر، التقييم الأدنى، والفرز حسب السعر/التقييم/الشعبية
 export function filterProductsList(
   products: Product[],
   options: ProductFilterOptions = {},
@@ -443,6 +458,7 @@ export function filterProductsList(
   return result;
 }
 
+// استخراج أفضل N منتج من حيث المبيعات، ثم النقرات، ثم التقييم، لعرضها في لوحة التحكم أو الصفحة الرئيسية
 export function getTopProductsFromProducts(products: Product[], count: number = 5) {
   return [...products]
     .sort((left, right) => {
@@ -466,6 +482,7 @@ export function getTopProductsFromProducts(products: Product[], count: number = 
     .slice(0, count);
 }
 
+// خوارزمية التوصية القائمة على المحتوى (Content-Based): تُقترح منتجات ذات صلة بناءً على تشابه الفئة، السعر، والشعبية
 export function getRelatedProductsFromProducts(
   products: Product[],
   productId: number,

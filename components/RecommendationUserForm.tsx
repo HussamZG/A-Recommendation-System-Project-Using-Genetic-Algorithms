@@ -14,6 +14,7 @@ interface RecommendationUserFormProps {
   compact?: boolean;
 }
 
+// نموذج إدخال معرّف المستخدم لتشغيل الخوارزمية الجينية: يتحقق من الصحة، يحفظ المستخدم في الكوكي، وينتقل لصفحة التوصيات
 export default function RecommendationUserForm({
   maxUserId,
   buttonLabel = 'احصل على توصياتي',
@@ -34,8 +35,8 @@ export default function RecommendationUserForm({
     }
 
     setError('');
-    rememberActiveUser(parsedUserId);
-    router.push(`/recommendations/${parsedUserId}`);
+    rememberActiveUser(parsedUserId); // حفظ المستخدم في الكوكي والتخزين المحلي
+    router.push(`/recommendations/${parsedUserId}`); // الانتقال لصفحة عرض التوصيات
   };
 
   return (

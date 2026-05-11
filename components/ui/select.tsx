@@ -1,3 +1,4 @@
+// قائمة منسدلة (Select): مكون اختيار كامل مع مشغل، محتوى، عناصر، وتمرير — من shadcn/ui
 "use client"
 
 import * as React from "react"

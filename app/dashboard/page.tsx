@@ -11,15 +11,17 @@ import {
 } from '@/lib/server/catalog';
 
 
+// صفحة لوحة تحكم الإحصائيات: تعرض ملخص المتجر، توزيع الفئات، مسار السلوك (funnel)، والمنتجات الأكثر مبيعاً
 export default async function DashboardPage() {
-  const { summary, products } = await getCatalogSnapshot();
-  const topProducts = getTopProductsFromProducts(products, 5);
-  const averageRating = calculateAverageRating(summary);
+  const { summary, products } = await getCatalogSnapshot(); // جلب لقطة الكتالوج من Supabase أو المحلي
+  const topProducts = getTopProductsFromProducts(products, 5); // استخراج أفضل 5 منتجات مبيعاً
+  const averageRating = calculateAverageRating(summary); // حساب متوسط التقييم المرجح
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="mb-8 text-3xl font-bold text-foreground">لوحة إحصائيات النظام</h1>
 
+      {/* بطاقات الإحصائيات الرئيسية: أعداد المستخدمين والمنتجات والتقييمات وسجلات السلوك */}
       <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="إجمالي المستخدمين" value={summary.totalUsers.toLocaleString()} icon={<Users className="h-6 w-6" />} />
         <StatsCard title="إجمالي المنتجات" value={summary.totalProducts.toLocaleString()} icon={<Package className="h-6 w-6" />} />
@@ -27,6 +29,7 @@ export default async function DashboardPage() {
         <StatsCard title="سجلات السلوك" value={summary.totalBehaviorRows.toLocaleString()} icon={<Activity className="h-6 w-6" />} trend="LIVE" trendUp />
       </div>
 
+      {/* قسم التوزيعات: توزيع الفئات (شريطي) + مسار السلوك (funnel) */}
       <div className="mb-8 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card p-6 shadow-sm lg:col-span-1">
           <h2 className="mb-4 text-lg font-bold text-foreground">توزيع المنتجات حسب الفئة</h2>
@@ -48,6 +51,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
+        {/* قسم مسار السلوك (Funnel): يعرض معدلات التحويل من مشاهدة إلى نقر إلى شراء */}
         <section className="rounded-2xl border border-border bg-card p-6 shadow-sm lg:col-span-2">
           <h2 className="mb-6 text-lg font-bold text-foreground">مسار سلوك المستخدمين</h2>
           <div className="space-y-6">
@@ -87,6 +91,7 @@ export default async function DashboardPage() {
         </section>
       </div>
 
+      {/* توزيع التقييمات (رسم بياني) + جدول أفضل 5 منتجات */}
       <div className="mb-8 grid gap-6 lg:grid-cols-3">
         <section>
           <RatingDistributionChart data={summary.ratingDistribution} />
@@ -138,6 +143,7 @@ export default async function DashboardPage() {
         </section>
       </div>
 
+      {/* قسم دعوة للتجربة (CTA): نموذج سريع لتشغيل التوصيات من لوحة التحكم */}
       <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-slate-900 to-primary p-8 shadow-lg">
         <div
           className="absolute inset-0 bg-gradient-to-tl from-[#181A1B] to-[#000000] opacity-80"

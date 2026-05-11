@@ -3,18 +3,21 @@ import usersRaw from "@/data/users.json";
 import summaryRaw from "@/data/summary.json";
 
 
+// تعريف الفئة: تحتوي على المعرّف، الاسم المعرب، ولون مميز للعرض في الواجهة
 export interface Category {
   id: string;
   name: string;
   color: string;
 }
 
+// تعريف المستخدم: يحمل المعرّف، العمر، واسم الدولة بالعربية
 export interface User {
   user_id: number;
   age: number;
   country: string;
 }
 
+// تعريف المنتج: يجمع المعلومات الأساسية (الاسم، الفئة، السعر، التقييم) + إحصائيات السلوك (مشاهدات، نقرات، مبيعات)
 export interface Product {
   product_id: number;
   name: string;
@@ -27,8 +30,10 @@ export interface Product {
   purchases: number;
 }
 
+// أنواع الفرز المتاحة للمنتجات: افتراضي، سعر تصاعدي/تنازلي، تقييم تنازلي، أو الأكثر شعبية
 export type ProductSort = "default" | "price-asc" | "price-desc" | "rating-desc" | "popular";
 
+// خيارات تصفية المنتجات: البحث النصي، الفئات، نطاق السعر، التقييم الأدنى، نوع الفرز، واستثناء معرّفات محددة
 export interface ProductFilterOptions {
   query?: string;
   categories?: string[];
@@ -91,6 +96,7 @@ interface SummaryRecord {
   topProducts: ProductRecord[];
 }
 
+// بيانات وصفية للفئات: تُستخدم لترجمة أسماء الفئات للعربية وتحديد لون لكل فئة
 const CATEGORY_META: Record<string, Omit<Category, "id">> = {
   Electronics: { name: "إلكترونيات", color: "#4361EE" },
   Sports: { name: "رياضة", color: "#1D9E75" },
@@ -101,6 +107,7 @@ const CATEGORY_META: Record<string, Omit<Category, "id">> = {
   "Home Appliances": { name: "أجهزة منزلية", color: "#185FA5" },
 };
 
+// ترجمة أسماء الدول للعربية لتُعرض بشكل صحيح في واجهة المستخدم
 const COUNTRY_LABELS: Record<string, string> = {
   Jordan: "الأردن",
   UAE: "الإمارات",
@@ -118,6 +125,7 @@ const summaryData = summaryRaw as SummaryRecord;
 export const MIN_USER_ID = 1;
 export const MAX_USER_ID = summaryData.totalUsers;
 
+// جلب معلومات الفئة (الاسم العربي + اللون) من البيانات الوصفية بناءً على معرّف الفئة
 export function getCategoryInfo(categoryId: string): Category {
   const meta = CATEGORY_META[categoryId];
 
@@ -128,10 +136,12 @@ export function getCategoryInfo(categoryId: string): Category {
   };
 }
 
+// بناء قائمة الفئات المتاحة باستخدام معلوماتها الوصفية
 export const CATEGORIES = Object.keys(CATEGORY_META).map((categoryId) =>
   getCategoryInfo(categoryId),
 );
 
+// ترجمة دولة المستخدم من الإنجليزية للعربية باستخدام خريطة COUNTRY_LABELS
 function hydrateUser(record: UserRecord): User {
   return {
     ...record,
@@ -139,6 +149,7 @@ function hydrateUser(record: UserRecord): User {
   };
 }
 
+// تطبيع (Hydrate) سجل منتج: تحويل معرّف الفئة إلى كائن Category كامل يحتوي الاسم العربي واللون
 export function hydrateProduct(record: ProductRecord): Product {
   return {
     ...record,
@@ -146,10 +157,12 @@ export function hydrateProduct(record: ProductRecord): Product {
   };
 }
 
+// تطبيع مصطلح البحث: إزالة المسافات الزائدة وتحويله لأحرف صغيرة لضمان المطابقة غير الحساسة لحالة الأحرف
 function normalizeSearchTerm(value: string) {
   return value.trim().toLowerCase();
 }
 
+// مطابقة نص البحث مع منتج: تبحث في الاسم، الفئة، والمعرّف مع تجاهل حالة الأحرف والرموز (#)
 function matchesQuery(product: Product, query: string) {
   const normalizedQuery = normalizeSearchTerm(query);
   if (!normalizedQuery) {
@@ -189,6 +202,7 @@ export function getProduct(id: number): Product | null {
   return PRODUCTS_BY_ID.get(id) ?? null;
 }
 
+// تصفية وفرز المنتجات بناءً على خيارات متعددة: البحث النصي، الفئات، نطاق السعر، التقييم، والفرز
 export function filterProducts(options: ProductFilterOptions = {}) {
   const {
     query = "",
@@ -239,6 +253,7 @@ export function filterProducts(options: ProductFilterOptions = {}) {
   return result;
 }
 
+// تقسيم قائمة المنتجات إلى صفحات (Pagination): يُحسب إجمالي الصفحات ويستخرج الشريحة الحالية
 export function paginateProducts(products: Product[], page: number, limit: number) {
   const totalPages = Math.max(1, Math.ceil(products.length / limit));
   const currentPage = Math.min(Math.max(page, 1), totalPages);
@@ -256,6 +271,7 @@ export function getAllProducts(page: number = 1, limit: number = 12) {
   return paginateProducts(PRODUCTS, page, limit);
 }
 
+// خوارزمية "منتجات قد تعجبك أيضاً" (Content-Based): تُقترح منتجات ذات صلة بناءً على تشابه الفئة، السعر، والشعبية
 export function getRelatedProducts(productId: number, count: number = 4): Product[] {
   const current = getProduct(productId);
   if (!current) {
@@ -287,14 +303,17 @@ export function getRelatedProducts(productId: number, count: number = 4): Produc
     .slice(0, count);
 }
 
+// جلب الملخص الإحصائي العام للمتجر من ملف JSON المحلي
 export function getSummary() {
   return summaryData;
 }
 
+// استخراج أفضل N منتج من الملخص الإحصائي (الأكثر مبيعاً) مع تطبيع بيانات الفئات
 export function getTopProducts(count: number = 5): Product[] {
   return summaryData.topProducts.slice(0, count).map(hydrateProduct);
 }
 
+// حساب متوسط التقييم المرجح لجميع المنتجات: يضرب كل تقييم بعدد مرات حصوله ثم يقسم على الإجمالي
 export function getAverageRating(): number {
   const totalRatings = summaryData.ratingDistribution.reduce(
     (sum, bucket) => sum + bucket.count,

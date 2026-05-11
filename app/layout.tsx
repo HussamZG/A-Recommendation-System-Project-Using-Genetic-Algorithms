@@ -8,9 +8,11 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { cn } from "@/lib/utils";
 
+// تحميل خطوط Google: Geist للرموز اللاتينية وCairo للنصوص العربية
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 const cairo = Cairo({ subsets: ['arabic', 'latin'] });
 
+// بيانات SEO العامة للموقع: العنوان والوصف يظهران في نتائج البحث والوسائط الاجتماعية
 export const metadata: Metadata = {
   title: 'مختبر التوصيات الجينية',
   description:

@@ -21,6 +21,7 @@ function readSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
 }
 
+// صفحة تفاصيل المنتج: تعرض معلومات المنتج، مؤشرات التفاعل، منتجات مشابهة، وتتبع المشاهدة
 export default async function ProductDetailPage({ params, searchParams }: ProductDetailPageProps) {
   const { productId } = await params;
   const searchParamsData = await searchParams;
@@ -31,7 +32,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const activeUserId = userIdParam ? Number(userIdParam) : null;
   const isValidUser = activeUserId && activeUserId >= 1 && activeUserId <= summary.totalUsers;
 
-  // Fetch user interaction for this product if user is specified
+  // جلب تفاعل المستخدم الحالي مع هذا المنتج إن وُجد (لعرض شارات "شاهدته/اشتريته")
   const userInteractions = isValidUser ? await getUserInteractions(activeUserId) : null;
   const userProductInteraction = userInteractions?.interactions.get(parsedProductId) ?? null;
 
@@ -39,6 +40,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     ? (productsById.get(parsedProductId) ?? null)
     : null;
 
+  // إن لم يُوجد المنتج يُعرض صفحة الخطأ 404
   if (!product) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
@@ -54,7 +56,9 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     );
   }
 
+  // جلب المنتجات المشابهة بناءً على نفس الفئة والسعر والشعبية (Content-Based Filtering)
   const relatedProducts = getRelatedProductsFromProducts(products, product.product_id, 4);
+  // حساب معدلات التحويل: النقر من المشاهدة، والشراء من المشاهدة
   const clickRate = product.views ? ((product.clicks / product.views) * 100).toFixed(1) : '0.0';
   const purchaseRate = product.views ? ((product.purchases / product.views) * 100).toFixed(1) : '0.0';
 

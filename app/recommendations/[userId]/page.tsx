@@ -12,19 +12,23 @@ interface RecommendationsPageProps {
   params: Promise<{ userId: string }>;
 }
 
+// صفحة عرض التوصيات الجينية لمستخدم محدد: تعرض القائمة المُحسّنة، سجل التفاعلات، وإحصائيات الأجيال
 export default async function RecommendationsPage({ params }: RecommendationsPageProps) {
   const { userId } = await params;
   const parsedUserId = Number(userId);
 
+  // التحقق من صحة معرّف المستخدم
   if (!Number.isInteger(parsedUserId) || parsedUserId <= 0) {
     notFound();
   }
 
+  // تشغيل الخوارزمية الجينية لبناء التوصيات + الإحصائيات + السجل
   const data = await getRecommendationPayload(parsedUserId);
   if (!data) {
     notFound();
   }
 
+  // تحديد أعلى درجة في الرسم البياني (لتطبيع المحور Y)
   const chartMax = Math.max(1, ...data.scoreHistory);
 
   return (
@@ -64,6 +68,7 @@ export default async function RecommendationsPage({ params }: RecommendationsPag
         </div>
       </section>
 
+      {/* قسم التوصيات المُحسّنة: قائمة أفضل 5 منتجات مختارة بالخوارزمية الجينية */}
       <section className="mb-12">
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-emerald-600 dark:text-emerald-400">
           <Sparkles className="h-6 w-6" />
@@ -83,6 +88,7 @@ export default async function RecommendationsPage({ params }: RecommendationsPag
         </div>
       </section>
 
+      {/* قسم سجل التفاعلات: يعرض تاريخ المستخدم مع المنتجات التي تفاعل معها مرتبة حسب اللياقة */}
       <section className="mb-12">
         <div className="mb-6 flex items-center gap-2">
           <History className="h-5 w-5 text-muted-foreground" />
@@ -132,6 +138,7 @@ export default async function RecommendationsPage({ params }: RecommendationsPag
         )}
       </section>
 
+      {/* قسم إحصائيات الخوارزمية الجينية: أفضل درجة، عدد التفاعلات، مصدر البيانات، وتطور الأجيال */}
       <section className="mb-12">
         <div className="mb-6 flex items-center gap-2">
           <BarChart2 className="h-5 w-5 text-muted-foreground" />
@@ -191,6 +198,7 @@ export default async function RecommendationsPage({ params }: RecommendationsPag
         </div>
       </section>
 
+      {/* قسم المنتجات ذات الصلة: 4 منتجات مشابهة للتوصية الأولى (Content-Based) */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-foreground">منتجات قد تعجبك أيضًا</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">

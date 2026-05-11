@@ -11,6 +11,7 @@ interface UserSelectorProps {
   maxUserId: number;
 }
 
+// مكون اختيار المستخدم النشط: يتيح تحديد مستخدم من الكوكي أو URL، وتمريره عبر جميع الصفحات
 export default function UserSelector({ maxUserId }: UserSelectorProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,12 +20,13 @@ export default function UserSelector({ maxUserId }: UserSelectorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
+    // جلب المستخدم النشط من الكوكي أو التخزين المحلي عند التحميل
     const active = getActiveUserIdFromDocument();
     if (active) {
       setCurrentUser(active);
     }
 
-    // Check URL param
+    // التحقق أيضاً من معامل URL (user) لربط التصفح بمستخدم محدد
     const urlUserId = searchParams.get('user');
     if (urlUserId) {
       const parsed = Number(urlUserId);
@@ -35,6 +37,7 @@ export default function UserSelector({ maxUserId }: UserSelectorProps) {
     }
   }, [searchParams, maxUserId]);
 
+  // عند تأكيد اختيار مستخدم جديد: يحفظه ويُحدّث URL لتمريره للصفحات الأخرى
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = Number(userId);
@@ -48,12 +51,12 @@ export default function UserSelector({ maxUserId }: UserSelectorProps) {
     setIsExpanded(false);
     toast.success(`تم تحديد المستخدم ${parsed}`);
 
-    // Refresh page with user param
     const params = new URLSearchParams(searchParams.toString());
     params.set('user', String(parsed));
     router.push(`?${params.toString()}`);
   };
 
+  // مسح المستخدم النشط: حذف الكوكي، التخزين المحلي، ومعامل URL
   const handleClear = () => {
     setCurrentUser(null);
     setUserId('');

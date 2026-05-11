@@ -13,14 +13,17 @@ import { filterProductsList, getCatalogSnapshot } from '@/lib/server/catalog';
 import { getUserInteractions, getUserRecommendations } from '@/lib/server/user-products';
 
 
+// خصائص صفحة المنتجات: تستقبل معاملات البحث (searchParams) للفلترة والفرز
 interface ProductsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+// قراءة معامل واحد من URL: إن كان مصفوفة نأخذ العنصر الأول، وإلا نستخدم القيمة المباشرة
 function readSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
 }
 
+// قراءة معامل مصفوفة من URL (مثل checkboxes متعددة للفئات)
 function readArrayParam(value: string | string[] | undefined) {
   if (Array.isArray(value)) {
     return value;
@@ -29,12 +32,12 @@ function readArrayParam(value: string | string[] | undefined) {
   return value ? [value] : [];
 }
 
+// تقييد رقم ضمن نطاق معين مع قيمة افتراضية fallback
 function clampNumber(value: string, fallback: number, min: number, max: number) {
-  // Handle empty string or whitespace-only strings
   if (!value || value.trim() === '') {
     return fallback;
   }
-  
+
   const parsedValue = Number(value);
   if (!Number.isFinite(parsedValue)) {
     return fallback;
@@ -43,6 +46,7 @@ function clampNumber(value: string, fallback: number, min: number, max: number) 
   return Math.min(Math.max(parsedValue, min), max);
 }
 
+// بناء رابط URL للصفحات بدون معرّف مستخدم (للتصفح العام)
 function buildProductsHref(
   current: {
     q: string;
@@ -92,6 +96,7 @@ function buildProductsHref(
   return queryString ? `/products?${queryString}` : '/products';
 }
 
+// بناء رابط URL للصفحات مع الحفاظ على معرّف المستخدم النشط (لتمريره عبر الصفحات)
 function buildProductsHrefWithUser(
   current: {
     q: string;
@@ -144,9 +149,10 @@ function buildProductsHrefWithUser(
   return queryString ? `/products?${queryString}` : '/products';
 }
 
+// الصفحة الرئيسية لتصفح المنتجات: تدعم البحث، الفلترة حسب الفئة/السعر/التقييم، الفرز، والتقسيم لصفحات
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
-  const { products, summary } = await getCatalogSnapshot();
+  const { products, summary } = await getCatalogSnapshot(); // جلب الكتالوج من Supabase أو المحلي
   const maxAllowedPrice = Math.ceil(summary.pricing.max);
   const minAllowedPrice = Math.floor(summary.pricing.min);
 
@@ -154,7 +160,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const activeUserId = userIdParam ? Number(userIdParam) : null;
   const isValidUser = activeUserId && activeUserId >= 1 && activeUserId <= summary.totalUsers;
 
-  // Fetch user data if a valid user is selected
+  // جلب بيانات المستخدم النشط إن وُجد: تفاعلاته وتوصياته الخاصة
   const userInteractions = isValidUser ? await getUserInteractions(activeUserId) : null;
   const userRecommendations = isValidUser ? await getUserRecommendations(activeUserId) : null;
 
@@ -178,6 +184,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const sort = (readSingleParam(params.sort) || 'default') as ProductSort;
   const page = clampNumber(readSingleParam(params.page), 1, 1, 10_000);
 
+  // تطبيق الفلاتر والفرز على قائمة المنتجات الكاملة
   const filteredProducts = filterProductsList(products, {
     query: q,
     categories,
@@ -187,7 +194,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     sortBy: sort,
   });
 
-  const pagination = paginateProducts(filteredProducts, page, 12);
+  const pagination = paginateProducts(filteredProducts, page, 12); // تقسيم النتائج إلى صفحات (12 منتج/صفحة)
   const currentFilters = {
     q,
     categories,
@@ -199,6 +206,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     maxAllowedPrice,
   };
 
+  // بناء نافذة أرقام الصفحات المعروضة (1, ... الحالية ..., الأخير)
   const pageWindow = Array.from({ length: pagination.totalPages }, (_, index) => index + 1)
     .filter((pageNumber) =>
       pageNumber === 1 ||

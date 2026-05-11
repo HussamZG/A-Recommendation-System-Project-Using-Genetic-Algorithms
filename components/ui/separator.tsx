@@ -1,3 +1,4 @@
+// فاصل (Separator): خط أفقي أو عمودي يفصل بين أقسام المحتوى — من shadcn/ui
 "use client"
 
 import { Separator as SeparatorPrimitive } from "@base-ui/react/separator"

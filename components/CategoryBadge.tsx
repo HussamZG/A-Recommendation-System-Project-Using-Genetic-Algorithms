@@ -1,3 +1,4 @@
+// شارة الفئة: تُعرض اسم الفئة باللون المخصص لها مع خلفية شفافة مُشتقة من نفس اللون
 export default function CategoryBadge({ name, color }: { name: string; color: string }) {
   return (
     <span

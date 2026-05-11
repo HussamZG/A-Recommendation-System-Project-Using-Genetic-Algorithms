@@ -1,3 +1,4 @@
+// شريط التقدم (Progress): مسار ومؤشر متحرك مع تسمية وقيمة — من shadcn/ui
 "use client"
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"

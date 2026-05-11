@@ -1,3 +1,4 @@
+// نافذة حوار (Dialog): نافذة منبثقة مع خلفية معتمة وزر إغلاق ورأس وتذييل — من shadcn/ui
 "use client"
 
 import * as React from "react"

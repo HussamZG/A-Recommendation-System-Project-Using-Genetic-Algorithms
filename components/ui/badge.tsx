@@ -1,3 +1,4 @@
+// شارة (Badge): عنصر صغير لتصنيف الحالة مع متغيرات لونية (default/secondary/destructive/outline/ghost/link) — من shadcn/ui
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"

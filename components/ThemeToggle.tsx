@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 
+// زر تبديل الوضع الليلي/النهاري: يستخدم next-themes مع منع عدم تطابق Hydration
 export default function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -14,7 +15,7 @@ export default function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // Prevent hydration mismatch by not rendering until mounted
+  // تجنب عدم تطابق Hydration: عدم العرض حتى يتم mount على المتصفح
   if (!mounted) {
     return (
       <button

@@ -1,3 +1,4 @@
+// مربع اختيار (Checkbox): عنصر تحديد مع أيقونة علامة — من shadcn/ui
 "use client"
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"

@@ -12,6 +12,7 @@ interface StatsCardProps {
   tooltipText?: string;
 }
 
+// بطاقة إحصائية عامة: تُستخدم في الصفحة الرئيسية ولوحة التحكم لعرض رقم مهم مع أيقونة وشارة اتجاه
 export default function StatsCard({
   title,
   value,

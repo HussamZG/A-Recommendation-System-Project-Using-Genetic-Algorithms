@@ -1,3 +1,4 @@
+// تلميح (Tooltip): نص منبثق صغير يظهر عند تمرير الماوس أو التركيز — من shadcn/ui
 "use client"
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"

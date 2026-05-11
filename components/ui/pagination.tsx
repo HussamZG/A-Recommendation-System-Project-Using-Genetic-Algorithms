@@ -1,3 +1,4 @@
+// ترقيم الصفحات (Pagination): أزرار التنقل بين الصفحات مع السابق/التالي وعلامة الحذف — من shadcn/ui
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

@@ -6,12 +6,14 @@ import StatsCard from '@/components/StatsCard';
 import { calculateAverageRating, getCatalogSnapshot } from '@/lib/server/catalog';
 
 
+// الصفحة الرئيسية: تعرض بطلية المشروع، إحصائيات نظرة عامة، ونموذج إدخال المستخدم لتجربة التوصيات
 export default async function Home() {
-  const { summary } = await getCatalogSnapshot();
-  const averageRating = calculateAverageRating(summary);
+  const { summary } = await getCatalogSnapshot(); // جلب الملخص الإحصائي من الكتالوج
+  const averageRating = calculateAverageRating(summary); // حساب متوسط التقييم المرجح
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* قسم البطل: يعرض اسم المشروع وشرح مختصر للخوارزمية الجينية */}
       <section className="relative mb-16 overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-700 px-6 py-16 text-white shadow-xl md:px-10 md:py-24">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_center,_white_0%,_transparent_70%)]" />
         <div className="relative z-10 mx-auto max-w-3xl text-center">
@@ -44,6 +46,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* قسم خطوات العمل: يشرح للمستخدم كيف تُنتج الخوارزمية التوصيات */}
       <section className="mb-20">
         <h2 className="mb-12 text-center text-3xl font-bold text-foreground">كيف يعمل النظام؟</h2>
         <div className="grid gap-8 md:grid-cols-3">
@@ -75,6 +78,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* قسم الإحصائيات السريعة: أعداد المستخدمين والمنتجات والفئات ومتوسط التقييم */}
       <section className="mb-20">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <StatsCard title="مستخدم مسجل" value={summary.totalUsers.toLocaleString()} icon={<Users className="h-6 w-6" />} />
@@ -84,6 +88,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* قسم استكشاف المنتجات: رابط سريع لصفحة التصفح مع محرك البحث والفلاتر */}
       <section className="mb-20">
         <div className="flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-border bg-card p-10 shadow-sm md:flex-row md:items-center md:p-12">
           <div>
@@ -102,6 +107,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* قسم تجربة النظام: نموذج إدخال معرّف المستخدم لتشغيل الخوارزمية الجينية */}
       <section
         id="try"
         className="mx-auto max-w-4xl rounded-[2rem] border border-border bg-card p-10 text-center shadow-sm md:p-16"

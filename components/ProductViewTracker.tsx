@@ -9,6 +9,7 @@ interface ProductViewTrackerProps {
   productId: number;
 }
 
+// مكون تتبع المشاهدة: يُرسل حدث 'view' للـ API مرة واحدة لكل (مستخدم + منتج) في الجلسة
 export default function ProductViewTracker({ productId }: ProductViewTrackerProps) {
   useEffect(() => {
     const activeUserId = getActiveUserIdFromDocument();
@@ -16,6 +17,7 @@ export default function ProductViewTracker({ productId }: ProductViewTrackerProp
       return;
     }
 
+    // مفتاح فريد في sessionStorage لتجنب تكرار تتبع نفس المشاهدة في نفس الجلسة
     const storageKey = `tracked:view:${activeUserId}:${productId}`;
 
     try {
@@ -26,6 +28,7 @@ export default function ProductViewTracker({ productId }: ProductViewTrackerProp
       // Ignore storage issues and continue with the request once.
     }
 
+    // إرسال حدث المشاهدة للخادم
     fetch('/api/track', {
       method: 'POST',
       headers: {

@@ -13,6 +13,7 @@ interface RecommendationReasonProps {
   purchases: number;
 }
 
+// مكون "لماذا هذا المنتج؟": يُحلل ويُبرر سبب اقتراح المنتج بناءً على الفئة، السعر، التقييم، والشعبية
 export default function RecommendationReason({
   categoryName,
   categoryColor,
@@ -22,10 +23,11 @@ export default function RecommendationReason({
   clicks,
   purchases,
 }: RecommendationReasonProps) {
+  // حساب معدلات التحويل من المشاهدة إلى النقر والشراء
   const clickRate = views > 0 ? ((clicks / views) * 100).toFixed(1) : '0';
   const purchaseRate = views > 0 ? ((purchases / views) * 100).toFixed(1) : '0';
 
-  // Calculate popularity score
+  // تقييم مستوى الشعبية (الأكثر مبيعاً / مبيعات جيدة / الأكثر مشاهدة / جديد)
   const getPopularityLevel = () => {
     if (purchases > 20) return { label: 'الأكثر مبيعاً', icon: TrendingUp, color: 'text-emerald-500' };
     if (purchases > 10) return { label: 'مبيعات جيدة', icon: TrendingUp, color: 'text-blue-500' };

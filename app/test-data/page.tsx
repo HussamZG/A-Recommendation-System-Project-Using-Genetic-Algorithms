@@ -1,9 +1,10 @@
 import { getCatalogSnapshot } from '@/lib/server/catalog';
 
+// صفحة اختبار البيانات: تعرض عينة من المنتجات والملخص الإحصائي للتحقق من اتصال Supabase أو المحلي
 export default async function TestDataPage() {
   const { products, source, summary } = await getCatalogSnapshot();
-  
-  // Get first 5 products to check
+
+  // استخراج أول 5 منتجات كعينة للعرض والتحقق
   const sampleProducts = products.slice(0, 5);
   
   return (

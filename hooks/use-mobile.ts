@@ -1,3 +1,4 @@
+// خطاف (Hook) للتحقق من حجم الشاشة: يُرجع true إن كان العرض أقل من 768px (جهاز محمول)
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
@@ -10,10 +11,10 @@ export function useIsMobile() {
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
-    
+
     mql.addEventListener("change", onChange)
-    
-    // Defer the set state to avoid the synchronous update effect error
+
+    // تأخير setState لتجنب خطأ التأثير المتزامن
     Promise.resolve().then(() => {
       if (isMobile === undefined) {
         setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)

@@ -18,6 +18,7 @@ interface ProductCardProps {
   showFitness?: boolean;
 }
 
+// بطاقة منتج: تُستخدم في شبكة المنتجات، تعرض الصورة/الفئة/التقييم/السعر، وتدعم شارات تفاعل المستخدم
 export default function ProductCard({ product, interaction = null, showFitness = false }: ProductCardProps) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden border border-border/70 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">

@@ -1,3 +1,4 @@
+// عنصر الهيكل العظمي (Skeleton): عنصر نائب بتأثير نبضي يُعرض أثناء تحميل البيانات — من shadcn/ui
 import { cn } from "@/lib/utils"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {

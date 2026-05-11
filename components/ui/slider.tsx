@@ -1,3 +1,4 @@
+// شريط التمرير (Slider): مكون نطاق من base-ui مع مسار ومؤشرات قابلة للسحب — من shadcn/ui
 import { Slider as SliderPrimitive } from "@base-ui/react/slider"
 
 import { cn } from "@/lib/utils"
@@ -10,6 +11,7 @@ function Slider({
   max = 100,
   ...props
 }: SliderPrimitive.Root.Props) {
+// تحديد القيم الحالية (مصفوفة) من القيمة أو القيمة الافتراضية أو النطاق الكامل
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)

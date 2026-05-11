@@ -22,8 +22,10 @@ interface RecommendationCardProps {
   isFirst?: boolean;
 }
 
+// بطاقة توصية مُحسّنة: تعرض منتجاً مقترحاً مع درجة ملاءمته، الشارات السلوكية، وزر الانتقال للتفاصيل
 export default function RecommendationCard({ item, isFirst }: RecommendationCardProps) {
   const { product, behavior, fitness } = item;
+  // تحديد إذا كان المنتج جديداً على المستخدم (لم يتفاعل معه من قبل)
   const isNewProduct = behavior.viewed === 0 && behavior.clicked === 0 && behavior.purchased === 0;
 
   return (

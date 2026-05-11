@@ -11,15 +11,16 @@ interface RatingDistributionChartProps {
   }>
 }
 
+// رسم بياني لتوزيع التقييمات: يعرض أعمدة ملونة لكل تقييم (1-5 نجوم) بنسب مئوية
 export function RatingDistributionChart({ data }: RatingDistributionChartProps) {
-  // Transform data for the chart
+  // تحويل البيانات لتناسب مكتبة Recharts
   const chartData = data.map((item) => ({
     stars: `${item.score}★`,
     percentage: item.percentage,
     score: item.score,
   }))
 
-  // Sort by score descending (5 to 1)
+  // الفرز تنازلياً من 5 إلى 1 نجوم لعرض الأعلى أولاً
   chartData.sort((a, b) => b.score - a.score)
 
   const chartConfig = {

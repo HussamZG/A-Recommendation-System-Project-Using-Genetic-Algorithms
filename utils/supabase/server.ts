@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+// جلب متغيرات بيئة Supabase المطلوبة للاتصال من جانب الخادم
 function getSupabaseEnv() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -14,6 +15,7 @@ function getSupabaseEnv() {
   return { supabaseUrl, supabaseKey };
 }
 
+// إنشاء عميل Supabase للخادم (Server Client): يُدار الكوكيز يدوياً لدعم Server Components و Route Handlers
 export async function createClient(
   cookieStore?: Awaited<ReturnType<typeof cookies>>,
 ) {

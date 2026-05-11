@@ -1,3 +1,4 @@
+// جدول (Table): جدول بيانات مع رأس وجسم وتذييل وصفوف وخلايا — من shadcn/ui
 "use client"
 
 import * as React from "react"

@@ -1,3 +1,4 @@
+// بطاقة تمرير (HoverCard): محتوى منبثق يظهر عند تمرير الماوس فوق عنصر — من shadcn/ui
 "use client"
 
 import { PreviewCard as PreviewCardPrimitive } from "@base-ui/react/preview-card"
